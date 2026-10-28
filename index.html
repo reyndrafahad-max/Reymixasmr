@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="lavender">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reymix</title>
+<style>
+:root{
+  --h:262;
+  --bg:hsl(var(--h) 60% 97%);
+  --card:#fff;
+  --ink:hsl(var(--h) 30% 16%);
+  --muted:hsl(var(--h) 10% 40%);
+  --line:hsl(var(--h) 30% 89%);
+  --ac:hsl(var(--h) 58% 50%);
+  --ac-ink:#fff;
+  --ac-soft:hsl(var(--h) 80% 94%);
+  --l1:hsl(6 76% 56%);
+  --l2:hsl(207 82% 48%);
+  --l3:hsl(152 52% 36%);
+  --ok:hsl(152 55% 30%);
+  --warn:hsl(30 90% 36%);
+  --bad:hsl(6 72% 45%);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:hsl(var(--h) 24% 9%);
+    --card:hsl(var(--h) 20% 14%);
+    --ink:hsl(var(--h) 25% 94%);
+    --muted:hsl(var(--h) 12% 70%);
+    --line:hsl(var(--h) 18% 23%);
+    --ac:hsl(var(--h) 70% 74%);
+    --ac-ink:hsl(var(--h) 40% 12%);
+    --ac-soft:hsl(var(--h) 30% 22%);
+    --l1:hsl(6 80% 68%);
+    --l2:hsl(207 85% 66%);
+    --l3:hsl(152 50% 56%);
+    --ok:hsl(152 50% 62%);
+    --warn:hsl(38 90% 62%);
+    --bad:hsl(6 82% 72%);
+  }
+}
+[data-theme="biru"]{--h:210}
+[data-theme="hijau"]{--h:158}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Nunito",ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.5;
+}
+main{max-width:560px;margin:0 auto;padding:20px 16px 190px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+h1{margin:0;font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-.03em}
+.sub{margin:6px 0 0;color:var(--muted);font-size:15px;max-width:30ch}
+h2{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}
+.hint{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+.themes{display:flex;gap:8px;padding-top:4px}
+.themes button{
+  width:30px;height:30px;border-radius:50%;border:3px solid var(--card);
+  box-shadow:0 0 0 2px var(--line);cursor:pointer;padding:0;
+}
+.themes button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.themes button:nth-child(1){background:hsl(262 58% 56%)}
+.themes button:nth-child(2){background:hsl(210 70% 52%)}
+.themes button:nth-child(3){background:hsl(158 55% 40%)}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:24px;
+  padding:18px;margin-bottom:14px;
+}
+.label{margin:0 0 8px;font-weight:700;font-size:15px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font:inherit;font-weight:700;font-size:14px;color:var(--ink);background:transparent;
+  border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:40px;
+}
+.chip.on{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+
+.layer{--lc:var(--l1)}
+.bars{display:flex;align-items:center;gap:3px;height:38px;margin-bottom:12px}
+.bars span{flex:1;background:var(--lc);border-radius:3px;opacity:.9;transition:height .15s ease;min-height:3px}
+
+.file{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 8px}
+.fname{font-size:14px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 120px}
+
+.btn{
+  font:inherit;font-weight:800;border:0;border-radius:16px;cursor:pointer;min-height:50px;padding:0 18px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--ac);color:var(--ac-ink);
+}
+.btn.sec{background:var(--ac-soft);color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--muted);text-decoration:underline}
+.btn.small{min-height:40px;padding:0 14px;font-size:14px;border-radius:14px}
+.btn:disabled{opacity:.5;cursor:default}
+
+.row{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;font-size:14px}
+.row label,.row span{font-weight:700}
+.row output{color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:6px 0 2px;accent-color:var(--lc,var(--ac));height:32px}
+.master input[type=range]{accent-color:var(--ac)}
+
+.sw{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;cursor:pointer}
+.sw span{font-weight:700;font-size:15px;line-height:1.3}
+.sw small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.sw input{
+  appearance:none;-webkit-appearance:none;flex:none;width:50px;height:30px;border-radius:15px;
+  background:var(--line);position:relative;margin:0;cursor:pointer;transition:background .15s;
+}
+.sw input::after{
+  content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .15s;
+}
+.sw input:checked{background:var(--lc,var(--ac))}
+.sw input:checked::after{transform:translateX(20px)}
+.master .sw input:checked{background:var(--ac)}
+
+button:focus-visible,input:focus-visible,label:focus-within{outline:3px solid var(--ac);outline-offset:2px}
+
+#status{margin:0;font-size:15px}
+#res{margin-top:12px}
+#res audio{width:100%;margin-bottom:10px}
+#info{font-size:14px;color:var(--muted);margin:0 0 12px}
+a.btn{text-decoration:none}
+
+.tag{font-weight:800;font-size:13px;white-space:nowrap}
+.tag::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:currentColor;margin-right:6px}
+.st0{color:var(--ok)}.st1{color:var(--warn)}.st2{color:var(--bad)}
+.bal{margin:12px 0 0;font-size:14px;color:var(--muted)}
+.verdict{font-weight:800;font-size:19px;margin:16px 0 2px;letter-spacing:-.01em}
+.cekrow{border-top:1px solid var(--line);padding:12px 0 2px;margin-top:12px}
+.cekrow .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cekrow b{font-size:15px}
+.cekrow p{margin:4px 0 8px;font-size:14px;color:var(--muted)}
+#cekout .hint{margin-top:12px}
+.bar{
+  position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.bar-in{max-width:560px;margin:0 auto}
+.meterrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.meter{flex:1;height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--ac);border-radius:5px;transition:width .08s linear}
+.meter i.hot{background:var(--l1)}
+#mt{min-width:96px;text-align:right;font-variant-numeric:tabular-nums}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Reymix</h1>
+      <p class="sub">Gabungkan beberapa suara jadi satu mix yang enak didengar.</p>
+    </div>
+    <div class="themes" role="group" aria-label="Pilih warna">
+      <button type="button" data-th="lavender" aria-label="Ungu" aria-pressed="true"></button>
+      <button type="button" data-th="biru" aria-label="Biru" aria-pressed="false"></button>
+      <button type="button" data-th="hijau" aria-label="Hijau" aria-pressed="false"></button>
+    </div>
+  </header>
+
+  <section class="card">
+    <p class="label">Mulai dari contoh</p>
+    <div class="chips" id="presets"></div>
+  </section>
+
+  <div id="layers"></div>
+
+  <section class="card master">
+    <h2>Rapikan suara</h2>
+    <p class="hint">Dikerjakan otomatis ke hasil gabungan.</p>
+    <label class="sw"><span>Buang dengung rendah<small>Memotong bunyi berat di bawah 80 Hz</small></span><input type="checkbox" role="switch" id="m-hp" checked></label>
+    <label class="sw"><span>Haluskan desis tajam<small>Memotong bunyi tipis di atas 14 kHz</small></span><input type="checkbox" role="switch" id="m-lp" checked></label>
+    <label class="sw"><span>Ratakan suara<small>Lonjakan keras ditekan pelan-pelan</small></span><input type="checkbox" role="switch" id="m-comp" checked></label>
+    <label class="sw"><span>Haluskan bagian yang tiba-tiba keras<small>Tiap suara dirata-ratakan sendiri, supaya bagian kerasnya tidak mengagetkan saat diulang</small></span><input type="checkbox" role="switch" id="m-lev" checked></label>
+    <div class="row"><label for="cf">Sambungan mulus</label><output id="cfo">4 detik</output></div>
+    <input id="cf" type="range" min="0" max="10" step="1" value="4">
+    <p class="hint">Ujung dan awal tiap suara dicampur supaya ulangannya tidak terasa.</p>
+    <div class="row"><label for="mv">Volume hasil</label><output id="mvo">-6 dB</output></div>
+    <input id="mv" type="range" min="-24" max="24" step="1" value="-6">
+    <p class="hint">Dipakai sama persis di pratinjau dan di file hasil.</p>
+    <button type="button" class="btn sec small" id="auto" style="margin-top:12px">Atur volume otomatis (sekitar -22 LUFS)</button>
+  </section>
+
+  <section class="card">
+    <h2>Cek untuk live</h2>
+    <p class="hint">Memeriksa apakah campuran ini enak dan aman didengar lama.</p>
+    <p class="bal" id="bal" aria-live="polite"></p>
+    <button type="button" class="btn sec" id="cek" style="margin-top:14px;width:100%">Cek untuk live</button>
+    <div id="cekout"></div>
+  </section>
+
+  <section class="card">
+    <h2>Hasil</h2>
+    <p id="status" role="status" aria-live="polite">Pilih suara di tiap kartu, lalu tekan Putar pratinjau.</p>
+    <div id="res" hidden>
+      <audio id="aud" controls></audio>
+      <p id="info"></p>
+      <a class="btn" id="dl" download="reymix.wav">Unduh hasil (WAV)</a>
+    </div>
+  </section>
+</main>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="meterrow"><div class="meter"><i id="mf"></i></div><span id="mt">Pratinjau mati</span></div>
+    <div class="acts">
+      <button type="button" class="btn sec" id="play">Putar pratinjau</button>
+      <button type="button" class="btn" id="save">Simpan hasil</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const PRESETS = {
+  seng:{n:'Hujan atap seng', L:[
+    ['Hujan di atap seng','Suara utama yang deras dan padat',65,0,false],
+    ['Air dari tepi atap','Aliran air, tetesan, dan cipratan',25,0,false],
+    ['Hujan jauh dan hutan','Bikin terasa luas dan dalam',10,0,true]]},
+  jendela:{n:'Hujan di jendela', L:[
+    ['Hujan di kaca jendela','Suara utama yang lembut',60,0,false],
+    ['Tetesan dan talang','Detail air yang menetes',25,0,false],
+    ['Hujan di luar rumah','Suasana luar yang jauh',15,0,true]]},
+  hutan:{n:'Hujan di hutan', L:[
+    ['Hujan di daun','Suara utama yang rimbun',60,0,false],
+    ['Air menetes dari pohon','Detail tetesan yang dekat',20,0,false],
+    ['Suasana hutan','Angin halus dan hujan jauh',20,0,true]]},
+  bebas:{n:'Bebas', L:[
+    ['Suara 1','Suara utama',60,0,false],
+    ['Suara 2','Suara pendukung',25,0,false],
+    ['Suara 3','Suara latar',15,0,true]]}
+};
+const layers = [0,1,2].map(()=>({t:'',h:'',v:0,pan:0,jauh:false,buf:null,name:''}));
+const M = {hp:true, lp:true, comp:true, lev:true, cf:4, vol:-6};
+let ac=null, live=null, playing=false, busy=false, starting=false, raf=0, urlOld=null;
+
+/* ---------- tampilan ---------- */
+function fmt(s){const m=Math.floor(s/60),d=Math.round(s%60);return m+':'+String(d).padStart(2,'0');}
+function panText(p){return p===0?'Tengah':(p<0?'Kiri ':'Kanan ')+Math.abs(p);}
+function st(m){$('status').textContent=m;}
+
+function drawBars(i){
+  const box=document.querySelector('[data-bars="'+i+'"]');
+  if(!box) return;
+  if(!box.children.length) for(let b=0;b<30;b++) box.appendChild(document.createElement('span'));
+  const s=0.2+0.8*layers[i].v/100;
+  [...box.children].forEach((sp,b)=>{
+    const base=0.3+0.7*Math.abs(Math.sin(b*1.3+i*2.1)*Math.cos(b*0.45+i));
+    sp.style.height=Math.max(3,Math.round(36*base*s))+'px';
+  });
+}
+function fileInfo(i){
+  const L=layers[i];
+  $('fn'+i).textContent = L.buf ? L.name+' ('+fmt(L.buf.duration)+')' : 'Belum ada suara';
+  $('cl'+i).hidden = !L.buf;
+}
+function renderLayers(){
+  $('layers').innerHTML = layers.map((L,i)=>`
+  <section class="card layer" style="--lc:var(--l${i+1})">
+    <div class="bars" data-bars="${i}" aria-hidden="true"></div>
+    <h2>${L.t}</h2>
+    <p class="hint">${L.h}</p>
+    <div class="file">
+      <label class="btn small sec">Pilih suara<input type="file" accept="audio/*" data-i="${i}" data-k="file" hidden></label>
+      <span class="fname" id="fn${i}"></span>
+      <button type="button" class="btn small ghost" id="cl${i}" data-i="${i}" data-k="clear" hidden>Lepas</button>
+    </div>
+    <div class="row"><label for="v${i}">Volume</label><output id="vo${i}">${L.v}%</output></div>
+    <input id="v${i}" type="range" min="0" max="100" value="${L.v}" data-i="${i}" data-k="v">
+    <div class="row"><label for="p${i}">Posisi kiri-kanan</label><output id="po${i}">${panText(L.pan)}</output></div>
+    <input id="p${i}" type="range" min="-100" max="100" value="${L.pan}" data-i="${i}" data-k="pan">
+    <label class="sw"><span>Efek jauh<small>Suara terdengar lebih jauh</small></span><input type="checkbox" role="switch" data-i="${i}" data-k="jauh" ${L.jauh?'checked':''}></label>
+  </section>`).join('');
+  layers.forEach((_,i)=>{drawBars(i);fileInfo(i);});
+}
+function applyPreset(key){
+  PRESETS[key].L.forEach((p,i)=>{
+    Object.assign(layers[i],{t:p[0],h:p[1],v:p[2],pan:p[3],jauh:p[4]});
+  });
+  document.querySelectorAll('#presets .chip').forEach(b=>b.classList.toggle('on',b.dataset.p===key));
+  renderLayers(); applyLive(); updateBal();
+}
+$('presets').innerHTML = Object.keys(PRESETS).map(k=>`<button type="button" class="chip" data-p="${k}">${PRESETS[k].n}</button>`).join('');
+$('presets').addEventListener('click',e=>{const b=e.target.closest('[data-p]'); if(b) applyPreset(b.dataset.p);});
+
+document.querySelector('.themes').addEventListener('click',e=>{
+  const b=e.target.closest('[data-th]'); if(!b) return;
+  document.documentElement.dataset.theme=b.dataset.th;
+  document.querySelectorAll('.themes button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+});
+
+/* ---------- input kartu ---------- */
+async function muat(i,file){
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    st('Membaca suara...');
+    const ab = await file.arrayBuffer();
+    const buf = await new Promise((res,rej)=>{
+      const p = ac.decodeAudioData(ab,res,rej); if(p&&p.catch) p.catch(rej);
+    });
+    layers[i].buf=buf; layers[i].pb=null; layers[i].rms=hitungRms(buf); layers[i].name=file.name; fileInfo(i); updateBal();
+    st('Suara terbaca. Tekan Putar pratinjau untuk mendengar.');
+    if(playing){stopLive();startLive();}
+  }catch(err){
+    st('File ini tidak bisa dibaca. Coba format WAV, MP3, atau M4A.');
+  }
+}
+const wrap=$('layers');
+['input','change'].forEach(ev=>wrap.addEventListener(ev,e=>{
+  const el=e.target, k=el.dataset.k, i=+el.dataset.i; if(!k) return;
+  if(k==='file'){ if(ev==='change' && el.files[0]) muat(i,el.files[0]); return; }
+  if(k==='v'){layers[i].v=+el.value;$('vo'+i).textContent=el.value+'%';drawBars(i);}
+  if(k==='pan'){layers[i].pan=+el.value;$('po'+i).textContent=panText(+el.value);}
+  if(k==='jauh'){layers[i].jauh=el.checked;}
+  applyLive(); updateBal();
+}));
+wrap.addEventListener('click',e=>{
+  const b=e.target.closest('[data-k="clear"]'); if(!b) return;
+  const i=+b.dataset.i; layers[i].buf=null; layers[i].pb=null; layers[i].name=''; fileInfo(i); updateBal();
+  if(playing){stopLive();if(layers.some(l=>l.buf))startLive();}
+});
+$('m-hp').onchange=e=>{M.hp=e.target.checked;applyLive();};
+$('m-lp').onchange=e=>{M.lp=e.target.checked;applyLive();};
+$('m-comp').onchange=e=>{M.comp=e.target.checked;applyLive();};
+function relive(){ if(playing){stopLive();startLive();} }
+$('m-lev').onchange=e=>{M.lev=e.target.checked;relive();};
+$('cf').addEventListener('input',e=>{M.cf=+e.target.value;$('cfo').textContent=M.cf?M.cf+' detik':'Mati';});
+$('cf').addEventListener('change',relive);
+$('mv').addEventListener('input',e=>{
+  M.vol=+e.target.value; $('mvo').textContent=M.vol+' dB'; applyLive();
+});
+
+/* ---------- rantai audio ---------- */
+function build(ctx,isLive){
+  const bus=ctx.createGain();
+  const hp=ctx.createBiquadFilter(); hp.type='highpass';
+  const comp=ctx.createDynamicsCompressor();
+  const lpm=ctx.createBiquadFilter(); lpm.type='lowpass';
+  const master=ctx.createGain();
+  bus.connect(hp); hp.connect(comp); comp.connect(lpm); lpm.connect(master);
+  const g={bus,hp,comp,lpm,master,layers:[]};
+  layers.forEach((L,i)=>{
+    if(!L.buf){g.layers[i]=null;return;}
+    const src=ctx.createBufferSource(); src.buffer=L.pb||L.buf; src.loop=true;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass';
+    const gn=ctx.createGain(), pn=ctx.createStereoPanner();
+    src.connect(lp); lp.connect(gn); gn.connect(pn); pn.connect(bus);
+    g.layers[i]={src,lp,gn,pn};
+  });
+  const lim=ctx.createDynamicsCompressor();
+  lim.threshold.value=-3; lim.knee.value=0; lim.ratio.value=20; lim.attack.value=0.003; lim.release.value=0.1;
+  master.connect(lim); lim.connect(ctx.destination);
+  if(isLive){
+    const an=ctx.createAnalyser(); an.fftSize=1024; master.connect(an); g.an=an;
+  }
+  return g;
+}
+function apply(g,isLive){
+  g.layers.forEach((n,i)=>{
+    if(!n) return; const L=layers[i];
+    n.gn.gain.value=L.v/100;
+    n.pn.pan.value=L.pan/100;
+    n.lp.frequency.value=L.jauh?4500:20000;
+  });
+  g.hp.frequency.value=M.hp?80:5;
+  g.lpm.frequency.value=M.lp?14000:20000;
+  if(M.comp){
+    g.comp.threshold.value=-30; g.comp.ratio.value=2.5; g.comp.knee.value=12;
+    g.comp.attack.value=0.03; g.comp.release.value=0.25;
+  } else { g.comp.threshold.value=0; g.comp.ratio.value=1; }
+  g.master.gain.value=Math.pow(10,M.vol/20);
+}
+function applyLive(){ if(live) apply(live,true); }
+
+/* ---------- pratinjau ---------- */
+/* ---------- olah suara: penghalus lonjakan + sambungan mulus ---------- */
+function kunci(){ return M.cf+'|'+(M.lev?1:0); }
+function prep(L){
+  const key=kunci();
+  if(L.pb && L.pk===key) return L.pb;
+  const src=L.buf, sr=src.sampleRate, ch=src.numberOfChannels;
+  const N=Math.min(src.length,Math.floor(600*sr));
+  const H=Math.max(1,Math.floor(sr/4)), nb=Math.ceil(N/H);
+  let gl=null;
+  if(M.lev && nb>=8){
+    const p=new Float64Array(nb);
+    for(let c=0;c<ch;c++){
+      const d=src.getChannelData(c);
+      for(let k=0;k<nb;k++){
+        let s=0; const a=k*H, e=Math.min(N,a+H);
+        for(let i=a;i<e;i++) s+=d[i]*d[i];
+        p[k]+=s/(e-a);
+      }
+    }
+    const env=new Float64Array(nb);
+    for(let k=0;k<nb;k++){
+      let s=0,n=0;
+      for(let j=k-2;j<=k+1;j++){ if(j>=0&&j<nb){s+=p[j];n++;} }
+      env[k]=10*Math.log10(s/n/ch+1e-12);
+    }
+    const sorted=Array.from(env).filter(v=>v>-80).sort((a,b)=>a-b);
+    if(sorted.length>8){
+      const target=sorted[sorted.length>>1]+1.5;
+      const gdb=new Float64Array(nb);
+      for(let k=0;k<nb;k++) gdb[k]=-Math.min(12,Math.max(0,env[k]-target));
+      const sm=new Float64Array(nb);
+      for(let k=0;k<nb;k++){
+        let s=0,n=0;
+        for(let j=k-2;j<=k+2;j++){ if(j>=0&&j<nb){s+=gdb[j];n++;} }
+        sm[k]=s/n;
+      }
+      if(sm.some(v=>v<-0.2)){
+        gl=new Float64Array(nb);
+        for(let k=0;k<nb;k++) gl[k]=Math.pow(10,sm[k]/20);
+      }
+    }
+  }
+  const gAt=i=>{
+    if(!gl) return 1;
+    const pos=i/H-0.5, k=Math.floor(pos), f=pos-k;
+    const a=gl[k<0?0:(k>nb-1?nb-1:k)], b=gl[k+1<0?0:(k+1>nb-1?nb-1:k+1)];
+    return a+(b-a)*f;
+  };
+  const C=M.cf>0?Math.min(Math.floor(M.cf*sr),Math.floor(N/3)):0;
+  const len=N-C;
+  const out=ac.createBuffer(ch,len,sr);
+  for(let c=0;c<ch;c++){
+    const d=src.getChannelData(c), o=out.getChannelData(c);
+    for(let i=0;i<len;i++) o[i]=d[i]*gAt(i);
+    for(let i=0;i<C;i++){
+      const t=i/C, j=N-C+i;
+      o[i]=d[i]*gAt(i)*Math.sin(t*Math.PI/2)+d[j]*gAt(j)*Math.cos(t*Math.PI/2);
+    }
+  }
+  L.pb=out; L.pk=key;
+  return out;
+}
+async function prepAll(){
+  const key=kunci();
+  const need=layers.filter(l=>l.buf && !(l.pb && l.pk===key));
+  if(!need.length) return;
+  st('Menyiapkan suara (sambungan mulus)...');
+  for(const L of need){
+    await new Promise(r=>setTimeout(r,20));
+    prep(L);
+  }
+}
+
+async function startLive(){
+  if(!layers.some(l=>l.buf)){st('Pilih minimal satu suara dulu.');return;}
+  if(starting) return;
+  starting=true;
+  try{
+    await prepAll();
+    ac.resume();
+    live=build(ac,true); apply(live,true);
+    live.layers.forEach(n=>n&&n.src.start());
+    playing=true; $('play').textContent='Stop pratinjau';
+    st('Pratinjau berjalan. Geser slider untuk menyetel.');
+    tick();
+  }catch(err){
+    st('Gagal menyiapkan suara. Coba file yang lebih pendek.');
+  }
+  starting=false;
+}
+function stopLive(){
+  if(live){live.layers.forEach(n=>{if(n){try{n.src.stop();}catch(e){} n.src.disconnect();}});}
+  live=null; playing=false; cancelAnimationFrame(raf);
+  $('play').textContent='Putar pratinjau';
+  $('mf').style.width='0'; $('mf').classList.remove('hot'); $('mt').textContent='Pratinjau mati';
+}
+function tick(){
+  if(!live) return;
+  const d=new Float32Array(1024); live.an.getFloatTimeDomainData(d);
+  let p=0; for(let i=0;i<d.length;i++){const a=Math.abs(d[i]); if(a>p)p=a;}
+  const db=20*Math.log10(p+1e-6);
+  $('mf').style.width=Math.max(0,Math.min(100,(db+60)/60*100))+'%';
+  $('mf').classList.toggle('hot',db>-3);
+  $('mt').textContent=(db<-60?'-60':db.toFixed(0))+' dB';
+  raf=requestAnimationFrame(tick);
+}
+$('play').onclick=()=>{
+  if(!ac){st('Pilih suara dulu di salah satu kartu.');return;}
+  playing?stopLive():startLive();
+};
+
+/* ---------- ukur kekerasan (perkiraan LUFS) ---------- */
+function koef(type,fs,f0,Q,G){
+  const w0=2*Math.PI*f0/fs,c=Math.cos(w0),s=Math.sin(w0),al=s/(2*Q);
+  let b0,b1,b2,a0,a1,a2;
+  if(type==='shelf'){
+    const A=Math.pow(10,G/40),sq=2*Math.sqrt(A)*al;
+    b0=A*((A+1)+(A-1)*c+sq); b1=-2*A*((A-1)+(A+1)*c); b2=A*((A+1)+(A-1)*c-sq);
+    a0=(A+1)-(A-1)*c+sq; a1=2*((A-1)-(A+1)*c); a2=(A+1)-(A-1)*c-sq;
+  } else {
+    b0=(1+c)/2; b1=-(1+c); b2=(1+c)/2; a0=1+al; a1=-2*c; a2=1-al;
+  }
+  return {b0:b0/a0,b1:b1/a0,b2:b2/a0,a1:a1/a0,a2:a2/a0};
+}
+async function ukur(chs,sr,prog){
+  const c1=koef('shelf',sr,1681.974450955533,0.7071752369554196,3.999843853973347);
+  const c2=koef('hp',sr,38.13547087602444,0.5003270373238773,0);
+  const mk=()=>({x1:0,x2:0,y1:0,y2:0});
+  const stt=chs.map(()=>[mk(),mk()]);
+  const n=chs[0].length, CH=500000; let sum=0;
+  for(let s=0;s<n;s+=CH){
+    const e=Math.min(n,s+CH);
+    chs.forEach((d,k)=>{
+      const A=stt[k][0],B=stt[k][1]; let acc=0;
+      for(let i=s;i<e;i++){
+        const x=d[i];
+        const y=c1.b0*x+c1.b1*A.x1+c1.b2*A.x2-c1.a1*A.y1-c1.a2*A.y2;
+        A.x2=A.x1;A.x1=x;A.y2=A.y1;A.y1=y;
+        const z=c2.b0*y+c2.b1*B.x1+c2.b2*B.x2-c2.a1*B.y1-c2.a2*B.y2;
+        B.x2=B.x1;B.x1=y;B.y2=B.y1;B.y1=z;
+        acc+=z*z;
+      }
+      sum+=acc/n;
+    });
+    prog(e/n);
+    await new Promise(r=>setTimeout(r));
+  }
+  return -0.691+10*Math.log10(sum+1e-12);
+}
+
+/* ---------- simpan WAV ---------- */
+function encodeWav(L,R,sr,gain){
+  const n=L.length, buf=new ArrayBuffer(44+n*4), v=new DataView(buf);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF'); v.setUint32(4,36+n*4,true); ws(8,'WAVE'); ws(12,'fmt ');
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,2,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*4,true); v.setUint16(32,4,true); v.setUint16(34,16,true);
+  ws(36,'data'); v.setUint32(40,n*4,true);
+  let o=44;
+  for(let i=0;i<n;i++){
+    let a=L[i]*gain, b=R[i]*gain;
+    a=a<-1?-1:a>1?1:a; b=b<-1?-1:b>1?1:b;
+    v.setInt16(o,Math.round(a<0?a*32768:a*32767),true); o+=2;
+    v.setInt16(o,Math.round(b<0?b*32768:b*32767),true); o+=2;
+  }
+  return new Blob([buf],{type:'audio/wav'});
+}
+async function simpan(){
+  if(busy) return;
+  const used=layers.filter(l=>l.buf);
+  if(!used.length){st('Pilih minimal satu suara dulu.');return;}
+  busy=true; $('save').disabled=true; $('res').hidden=true;
+  if(playing) stopLive();
+  try{
+    const sr=ac.sampleRate;
+    await prepAll();
+    let dur=Math.max(...used.map(l=>(l.pb||l.buf).duration)), note='';
+    if(dur>600){dur=600;note=' Durasi dipotong jadi 10 menit.';}
+    st('Menggabungkan suara...');
+    await new Promise(r=>setTimeout(r,30));
+    const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    const off=new OC(2,Math.ceil(dur*sr),sr);
+    const g=build(off,false); apply(g,false);
+    g.layers.forEach(n=>n&&n.src.start(0));
+    const out=await off.startRendering();
+    const L=out.getChannelData(0), R=out.getChannelData(1);
+    let peak=0;
+    for(let i=0;i<L.length;i++){const a=Math.abs(L[i]),b=Math.abs(R[i]); if(a>peak)peak=a; if(b>peak)peak=b;}
+    if(peak<1e-4) throw new Error('sepi');
+    const lufs=await ukur([L,R],sr,p=>st('Mengukur kekerasan suara... '+Math.round(p*100)+'%'));
+    const gain=peak>0.9?0.9/peak:1;
+    const finalL=lufs+20*Math.log10(gain), finalPk=20*Math.log10(peak*gain);
+    st('Menyiapkan file...');
+    await new Promise(r=>setTimeout(r,30));
+    const blob=encodeWav(L,R,sr,gain);
+    if(urlOld) URL.revokeObjectURL(urlOld);
+    urlOld=URL.createObjectURL(blob);
+    $('aud').src=urlOld; $('dl').href=urlOld;
+    $('info').textContent='Hasil: sekitar '+finalL.toFixed(1)+' LUFS, puncak '+finalPk.toFixed(1)+' dB, '
+      +fmt(dur)+', '+(blob.size/1048576).toFixed(1)+' MB.'
+      +note+' Cek untuk live: '+ringkasCek(nilaiCek(analisis(L,R,sr,finalL,gain)).concat([cekSeimbang()]))+'. Rinciannya ada di tombol Cek untuk live.';
+    $('res').hidden=false;
+    st('Selesai. Dengarkan di bawah, lalu unduh.');
+    $('dl').click();
+  }catch(err){
+    st(err.message==='sepi'
+      ? 'Hasil hampir tanpa suara. Naikkan volume layer atau cek file-nya.'
+      : 'Gagal menggabungkan. Coba file yang lebih pendek atau lebih sedikit suara.');
+  }
+  busy=false; $('save').disabled=false;
+}
+/* ---------- cek untuk live ---------- */
+const NAMA=['Aman','Hati-hati','Kurang disarankan'];
+const fk=v=>v.toFixed(1).replace('.',',');
+function hitungRms(buf){
+  const n=Math.min(buf.length,Math.floor(60*buf.sampleRate)), ch=buf.numberOfChannels;
+  let s=0;
+  for(let c=0;c<ch;c++){
+    const d=buf.getChannelData(c); let a=0;
+    for(let i=0;i<n;i++) a+=d[i]*d[i];
+    s+=a/n;
+  }
+  return 10*Math.log10(s/ch+1e-12);
+}
+function cekSeimbang(){
+  const e=layers.map(L=>(L.buf&&L.v>0&&L.rms>-90)?L.rms+20*Math.log10(L.v/100):null);
+  const n=e.filter(v=>v!==null).length;
+  const hasil={nama:'Keseimbangan suara',nilai:'',level:0,teks:''};
+  if(n<2){
+    hasil.level=-1;
+    hasil.teks=n?'Hanya satu suara aktif, belum ada yang dibandingkan.':'Pilih suara dulu untuk melihat saran keseimbangan.';
+    return hasil;
+  }
+  const pct=(i,target)=>Math.max(1,Math.min(100,Math.round(layers[i].v*Math.pow(10,(target-e[i])/20))));
+  const t=[]; const add=(lv,msg)=>{hasil.level=Math.max(hasil.level,lv);t.push(msg);};
+  if(e[0]!==null&&e[1]!==null){
+    const d=e[1]-e[0];
+    if(d>0) add(d>4?2:1,'"'+layers[1].t+'" lebih keras dari suara utama. Coba turunkan ke sekitar '+pct(1,e[0]-8)+'%.');
+  }
+  if(e[0]!==null&&e[2]!==null){
+    const d=e[2]-e[0];
+    if(d>0) add(2,'"'+layers[2].t+'" lebih keras dari suara utama. Coba turunkan ke sekitar '+pct(2,e[0]-14)+'%.');
+    else if(d>-3) add(1,'"'+layers[2].t+'" hampir sekeras suara utama. Coba turunkan ke sekitar '+pct(2,e[0]-14)+'%.');
+  }
+  if(!t.length&&e[1]!==null&&e[2]!==null&&e[2]>e[1]){
+    add(1,'"'+layers[2].t+'" lebih keras dari "'+layers[1].t+'". Coba turunkan ke sekitar '+pct(2,e[1]-6)+'%.');
+  }
+  hasil.teks=t.length?t.join(' '):'Perbandingan antar suara sudah masuk akal.';
+  return hasil;
+}
+function updateBal(){
+  const el=$('bal'); if(!el) return;
+  const r=cekSeimbang();
+  el.textContent='';
+  if(r.level>=0){
+    const tg=document.createElement('span'); tg.className='tag st'+r.level; tg.textContent=NAMA[r.level];
+    el.appendChild(tg); el.appendChild(document.createTextNode(' '));
+  }
+  el.appendChild(document.createTextNode(r.teks));
+}
+function analisis(L,R,sr,lufs,gain){
+  const n=L.length, B=sr, nb=Math.floor(n/B), PB=Math.max(1,Math.floor(sr/10)), npb=Math.floor(n/PB);
+  const pw=new Float64Array(nb);
+  for(let k=0;k<nb;k++){
+    let s=0; for(let i=k*B,e=i+B;i<e;i++) s+=L[i]*L[i]+R[i]*R[i];
+    pw[k]=s/(2*B);
+  }
+  const pk=new Float32Array(npb); let peak=0;
+  for(let k=0;k<npb;k++){
+    let m=0;
+    for(let i=k*PB,e=i+PB;i<e;i++){const a=Math.abs(L[i]),b=Math.abs(R[i]); if(a>m)m=a; if(b>m)m=b;}
+    pk[k]=m; if(m>peak)peak=m;
+  }
+  const g=gain||1;
+  const r={lufs,peakDb:20*Math.log10(peak*g+1e-9),pendek:nb<8,lj:0,tMax:0,menempel:0};
+  if(!r.pendek){
+    const w=[]; for(let k=0;k+2<nb;k++) w.push(10*Math.log10((pw[k]+pw[k+1]+pw[k+2])/3+1e-12));
+    const s=w.slice().sort((a,b)=>a-b), med=s[s.length>>1];
+    let mx=-999,at=0; w.forEach((v,k)=>{if(v>mx){mx=v;at=k;}});
+    r.lj=mx-med; r.tMax=at+1;
+  }
+  if(r.peakDb>-6){
+    const thr=peak*Math.pow(10,-0.7/20); let c=0;
+    for(let k=0;k<npb;k++) if(pk[k]>=thr) c++;
+    r.menempel=c/Math.max(1,npb);
+  }
+  return r;
+}
+function nilaiCek(a){
+  const out=[];
+  // kekerasan
+  let lv=0,t; const l=a.lufs;
+  if(l>-16){lv=2;t='Terlalu keras untuk didengar lama. Turunkan Volume hasil sekitar '+Math.round(l+23)+' dB.';}
+  else if(l>-20){lv=1;t='Agak keras untuk didengar lama. Turunkan Volume hasil sekitar '+Math.round(l+23)+' dB.';}
+  else if(l<-30){lv=2;t='Terlalu pelan, pendengar bisa tidak mendengarnya. Naikkan Volume hasil sekitar '+Math.round(-23-l)+' dB, atau tekan Atur volume otomatis.';}
+  else if(l<-26){lv=1;t='Agak pelan. Naikkan Volume hasil sekitar '+Math.round(-23-l)+' dB, atau tekan Atur volume otomatis.';}
+  else t='Pas untuk live yang lama.';
+  out.push({nama:'Kekerasan',nilai:fk(l)+' LUFS',level:lv,teks:t});
+  // lonjakan
+  if(a.pendek){
+    out.push({nama:'Lonjakan',nilai:'',level:0,teks:'Suaranya terlalu pendek untuk dicek lonjakannya.'});
+  } else {
+    lv=a.lj>10?2:(a.lj>6?1:0);
+    t=lv===0?'Suara stabil, tidak ada bagian yang tiba-tiba keras.'
+      :'Ada bagian '+fk(a.lj)+' dB lebih keras dari suara biasa, sekitar detik '+a.tMax+'. '
+       +(M.lev?'Coba kurangi volume suara yang paling keras, atau potong bagian itu di file sumber.'
+               :'Nyalakan Haluskan bagian yang tiba-tiba keras, atau potong bagian itu di file sumber.');
+    out.push({nama:'Lonjakan',nilai:fk(a.lj)+' dB',level:lv,teks:t});
+  }
+  // puncak
+  lv=a.menempel>0.08?2:(a.menempel>0.02?1:0);
+  t=lv===0?'Masih lega, tidak ada tanda suara pecah.'
+    :'Puncak suara sering mentok di batas, tanda suara mulai ditahan limiter dan bisa terdengar pecah. Turunkan Volume hasil atau volume suara yang paling keras.';
+  out.push({nama:'Puncak suara',nilai:fk(a.peakDb)+' dB',level:lv,teks:t});
+  return out;
+}
+function ringkasCek(items){
+  const bad=items.filter(i=>i.level>0);
+  if(!bad.length) return 'aman';
+  return ['','hati-hati','kurang disarankan'][Math.max(...bad.map(i=>i.level))]+' ('+bad.map(i=>i.nama.toLowerCase()).join(', ')+')';
+}
+function tampilCek(items,catatan){
+  const box=$('cekout'); box.textContent='';
+  const lv=Math.max(0,...items.map(i=>i.level));
+  const v=document.createElement('div'); v.className='verdict st'+lv;
+  v.textContent=['Aman untuk live','Hati-hati, ada yang perlu dicek','Kurang disarankan untuk live'][lv];
+  box.appendChild(v);
+  items.forEach(it=>{
+    const row=document.createElement('div'); row.className='cekrow';
+    const top=document.createElement('div'); top.className='top';
+    const b=document.createElement('b'); b.textContent=it.nama+(it.nilai?': '+it.nilai:'');
+    const tg=document.createElement('span'); tg.className='tag st'+Math.max(0,it.level); tg.textContent=NAMA[Math.max(0,it.level)];
+    top.appendChild(b); top.appendChild(tg);
+    const p=document.createElement('p'); p.textContent=it.teks;
+    row.appendChild(top); row.appendChild(p); box.appendChild(row);
+  });
+  if(catatan){const h=document.createElement('p'); h.className='hint'; h.textContent=catatan; box.appendChild(h);}
+}
+async function cekLive(){
+  if(busy) return;
+  const used=layers.filter(l=>l.buf);
+  if(!used.length){st('Pilih minimal satu suara dulu.');return;}
+  busy=true; $('cek').disabled=true;
+  try{
+    if(playing) stopLive();
+    await prepAll();
+    const sr=ac.sampleRate;
+    const longest=Math.max(...used.map(l=>(l.pb||l.buf).duration));
+    const dur=Math.min(180,longest);
+    st('Mengecek suara...');
+    await new Promise(r=>setTimeout(r,30));
+    const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    const off=new OC(2,Math.ceil(dur*sr),sr);
+    const g=build(off,false); apply(g,false);
+    g.layers.forEach(n=>n&&n.src.start(0));
+    const out=await off.startRendering();
+    const L=out.getChannelData(0), R=out.getChannelData(1);
+    const lufs=await ukur([L,R],sr,p=>st('Mengecek suara... '+Math.round(p*100)+'%'));
+    if(lufs<-80) throw new Error('sepi');
+    const items=nilaiCek(analisis(L,R,sr,lufs,1));
+    const bal=cekSeimbang(); if(bal.level>=0) items.push(bal);
+    tampilCek(items,'Dicek dari '+fmt(dur)+(longest>dur?' pertama':'')+' campuranmu. Angka batasnya patokan umum, telingamu tetap yang menentukan.');
+    st('Pengecekan selesai.');
+  }catch(err){
+    st(err.message==='sepi'?'Suaranya hampir kosong, naikkan volume layer dulu.':'Gagal mengecek. Coba lagi.');
+  }
+  busy=false; $('cek').disabled=false;
+}
+$('cek').onclick=cekLive;
+
+async function autoVol(){
+  if(busy) return;
+  const used=layers.filter(l=>l.buf);
+  if(!used.length){st('Pilih minimal satu suara dulu.');return;}
+  busy=true; $('auto').disabled=true;
+  try{
+    const TARGET=-22, sr=ac.sampleRate;
+    await prepAll();
+    const dur=Math.min(120,Math.max(...used.map(l=>(l.pb||l.buf).duration)));
+    st('Mengukur suara...');
+    await new Promise(r=>setTimeout(r,30));
+    const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    const off=new OC(2,Math.ceil(dur*sr),sr);
+    const g=build(off,false); apply(g,false);
+    g.master.gain.value=Math.pow(10,-30/20);
+    g.layers.forEach(n=>n&&n.src.start(0));
+    const out=await off.startRendering();
+    const lm=await ukur([out.getChannelData(0),out.getChannelData(1)],sr,()=>{});
+    if(lm<-80) throw new Error('sepi');
+    const vol=Math.max(-24,Math.min(24,Math.round(TARGET-(lm+30))));
+    M.vol=vol; $('mv').value=vol; $('mvo').textContent=vol+' dB';
+    applyLive();
+    st('Volume hasil diatur ke '+vol+' dB. Putar pratinjau untuk mendengar, geser lagi kalau perlu.');
+  }catch(err){
+    st(err.message==='sepi'?'Suaranya hampir kosong, naikkan volume layer dulu.':'Gagal mengukur. Coba lagi.');
+  }
+  busy=false; $('auto').disabled=false;
+}
+$('auto').onclick=autoVol;
+$('save').onclick=simpan;
+
+applyPreset('seng');
+</script>
+</body>
+</html>
